@@ -1,0 +1,78 @@
+import numpy as np
+
+# y = wx + b 计算Loss
+def compute_error_for_line_given_points(b, w, points):　　　　　　#根据当前的w，b参数计算均方差损失
+    totalError = 0
+    for i in range(0, len(points)):                             #循环迭代points的所有点
+        x = points[i, 0]                                        #获得i号点的x值
+        y = points[i, 1]                                        #获得i号点的y值
+        totalError += (y - (w * x + b)) ** 2                    # computer mean-squared-error
+    return totalError / float(len(points))                      # average loss for each point
+
+def step_gradient(b_current, w_current, points, learningRate):
+    b_gradient = 0                                              #计算误差函数在所有点上的导数，并更新w，b
+    w_gradient = 0
+    N = float(len(points))                                      #总样本数转化为float型
+    for i in range(0, len(points)):
+        x = points[i, 0]
+        y = points[i, 1]
+        # grad_b = 2(wx+b-y)
+        b_gradient += (2/N) * ((w_current * x + b_current) - y)       #误差函数对b的导数，公式中的累加用+=
+        # grad_w = 2(wx+b-y)*x
+        w_gradient += (2/N) * x * ((w_current * x + b_current) - y)   #误差函数对w的导数
+    
+    new_b = b_current - (learningRate * b_gradient)                   #根据梯度下降算法更新b，learningRate为衰减率
+    new_w = w_current - (learningRate * w_gradient)                   #根据梯度下降算法更新w
+    return [new_b, new_w]
+
+def gradient_descent_runner(points, starting_b, starting_w, learning_rate, num_iterations):
+    b = starting_b                                                    #b的初始值
+    w = starting_w                                                    #w的初始值
+    # update for several times
+    for i in range(num_iterations):                                   #根据梯度下降算法循环多次，num_iterations是循环次数
+        b, w = step_gradient(b, w, np.array(points), learning_rate)
+    return [b, w]
+
+
+def run():
+	
+    points = np.genfromtxt("data03.csv", delimiter=",")               #加载已获取的数据文件
+    learning_rate = 0.0001
+    initial_b = 0 # initial y-intercept guess
+    initial_w = 0 # initial slope guess
+    num_iterations = 1000
+    print("Starting gradient descent at b = {0}, w = {1}, error = {2}"
+          .format(initial_b, initial_w,
+                  compute_error_for_line_given_points(initial_b, initial_w, points))
+          )                                                           #输出w，b的初始值及初始误差
+    print("Running...")
+    [b, w] = gradient_descent_runner(points, initial_b, initial_w, learning_rate, num_iterations)
+    print("After {0} iterations b = {1}, w = {2}, error = {3}".
+          format(num_iterations, b, w,
+                 compute_error_for_line_given_points(b, w, points))
+          )
+
+if __name__ == '__main__':
+    run()
+
+
+
+====================== RESTART: /Users/nicole/Documents/python1.py =====================
+Starting gradient descent at b = 0, w = 0, error = 5565.107834490552
+Running...
+After 1000 iterations b = 0.08893651996682016, w = 1.4777440851889796, error = 112.61481010123588
+>>> 
+
+
+====================== RESTART: /Users/nicole/Documents/python1.py =====================
+Starting gradient descent at b = 0, w = 0, error = 138.6549595958658
+Running...
+After 1000 iterations b = 0.1702500519705245, w = 1.4665325353781298, error = 0.011428513311739502
+>>> 
+
+
+====================== RESTART: /Users/nicole/Documents/python1.py =====================
+Starting gradient descent at b = 0, w = 0, error = 73.50843868694056
+Running...
+After 1000 iterations b = 0.016126804461363674, w = 1.4750509715027764, error = 0.005807833031568398
+>>>
